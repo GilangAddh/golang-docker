@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  backend:
+    build: .
+    container_name: go_backend
+    restart: always
+    environment:
+      DB_URL: "postgres://admin:admin123@pgsql_local:5433/employees_db"
+    ports:
+      - "8080:8080"
+    networks:
+      - globalnet
+
+networks: 
+  globalnet:
+    external: true

@@ -1,0 +1,9 @@
+CREATE TABLE users (
+    id serial PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP,
+    name VARCHAR (100) NOT NULL,
+    position VARCHAR (100) NOT NULL,
+    salary NUMERIC NOT NULL
+)
