@@ -2,7 +2,6 @@ package repository
 
 import (
 	"backend/internal/app"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -17,9 +16,18 @@ func NewUserRepository() *UserRepository {
 
 func (r *UserRepository) FindAll(db *gorm.DB) ([]app.User, error) {
 	var users []app.User
-	if err := db.Debug().Where("deleted_at IS NULL").Find(&users).Error; err != nil {
+	if err := db.Where("deleted_at IS NULL").Find(&users).Error; err != nil {
 		return nil, err
 	}
-	fmt.Println(len(users))
+
 	return users, nil
+}
+
+func (r *UserRepository) FindDetail(db *gorm.DB, dataID uint) (app.User, error) {
+	var user app.User
+	if err := db.Where("deleted_at IS NULL").First(&user, dataID).Error; err != nil {
+		return app.User{}, err
+	}
+
+	return user, nil
 }

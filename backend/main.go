@@ -1,7 +1,7 @@
 package main
 
 import (
-	"backend/internal/app"
+	myhttp "backend/http"
 	"backend/internal/handler"
 	"backend/internal/repository"
 	"backend/internal/service"
@@ -21,16 +21,30 @@ func main() {
 		log.Fatal("failed to connect database:", err)
 	}
 
-	// Auto migrate
-	db.AutoMigrate(&app.User{})
+	// Err Handler
+	app := fiber.New(fiber.Config{
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			if e, ok := err.(*myhttp.RequestError); ok {
+				return c.Status(e.StatusCode).JSON(fiber.Map{
+					"status":  e.StatusCode,
+					"message": e.Message,
+					"errors":  e.Errors,
+				})
+			}
 
-	// Dependency Injection
+			// Default
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status":  fiber.StatusInternalServerError,
+				"message": "Internal Server Error",
+				"errors":  err.Error(),
+			})
+		},
+	})
+
+	// Setup
 	userRepo := repository.NewUserRepository()
 	userService := service.NewUserService(db, userRepo)
 	userHandler := handler.NewUserHandler(userService)
-
-	// Setup Fiber
-	app := fiber.New()
 
 	// Routes
 	router.SetupRoutes(app, userHandler)
